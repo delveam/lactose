@@ -30,7 +30,7 @@ raylib/src/libraylib.a: raylib
 	cd raylib/src; $(EMAR) rcs libraylib.a rcore.o rshapes.o rtextures.o rtext.o rmodels.o utils.o raudio.o
 	@echo ""
 
-build/index.html: raylib/src/libraylib.a $(GAME_HEADERS) $(GAME_SOURCES) $(CONTENT_SOURCES) | build
+build/index.html: raylib/src/libraylib.a src/minshell.html $(GAME_HEADERS) $(GAME_SOURCES) $(CONTENT_SOURCES) | build
 	$(EMCC) -o build/index.html $(GAME_SOURCES) -Os -Wall raylib/src/libraylib.a -I. -Iraylib/src -L. -Lraylib/src -s USE_GLFW=3 --shell-file src/minshell.html -DPLATFORM_WEB
 
 .PHONY: release
