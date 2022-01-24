@@ -37,6 +37,10 @@ build/index.html: raylib/src/libraylib.a src/minshell.html $(GAME_HEADERS) $(GAM
 release: build/index.html
 	@echo Done
 
+.PHONY: format
+format:
+	astyle -n -xC100 -S -xb -j --style=allman --recursive "src/*.c,*.h"
+
 .PHONY: clean
 clean:
 	if [ -d "raylib" ]; then rm -rf raylib; fi
