@@ -31,7 +31,7 @@ raylib/src/libraylib.a: raylib
 	@echo ""
 
 build/index.html: raylib/src/libraylib.a src/minshell.html $(GAME_HEADERS) $(GAME_SOURCES) $(CONTENT_SOURCES) | build
-	$(EMCC) -o build/index.html $(GAME_SOURCES) -Os -Wall raylib/src/libraylib.a -I. -Iraylib/src -L. -Lraylib/src -s USE_GLFW=3 --shell-file src/minshell.html -DPLATFORM_WEB
+	$(EMCC) -o build/index.html $(GAME_SOURCES) -Os -Wall raylib/src/libraylib.a -I. -Iraylib/src -L. -Lraylib/src -s USE_GLFW=3 --shell-file src/minshell.html --preload-file src/resources -DPLATFORM_WEB
 
 .PHONY: release
 release: build/index.html
