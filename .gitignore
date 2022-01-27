@@ -1,6 +1,8 @@
 .ccls-cache
+.vscode
 build
 raylib
+src/raylib_game
 
 # Prerequisites
 *.d
