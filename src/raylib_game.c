@@ -11,8 +11,9 @@
 *   Copyright (c) 2021 Ramon Santamaria (@raysan5)
 *
 ********************************************************************************************/
-
 #include "raylib.h"
+#include "player.h"
+#include "grid.h"
 
 #if defined(PLATFORM_WEB)
 #include <emscripten/emscripten.h>
@@ -22,15 +23,14 @@
 // Shared Variables Definition (global)
 // NOTE: Those variables are shared between modules through screens.h
 //----------------------------------------------------------------------------------
-Font font = { 0 };
-Music music = { 0 };
-Sound fxCoin = { 0 };
 
 //----------------------------------------------------------------------------------
 // Local Variables Definition (local to this module)
 //----------------------------------------------------------------------------------
 static const int screenWidth = 256;
 static const int screenHeight = 256;
+
+static Player player;
 
 //----------------------------------------------------------------------------------
 // Local Functions Declaration
@@ -47,15 +47,10 @@ int main(void)
     //---------------------------------------------------------
     InitWindow(screenWidth, screenHeight, "raylib game template");
 
-    InitAudioDevice();      // Initialize audio device
+    InitWorld();
+    PlayerInit(&player, 2, 2, 8);
 
     // Load global data (assets that must be available in all screens, i.e. font)
-    font = LoadFont("resources/mecha.png");
-    music = LoadMusicStream("resources/ambient.ogg");
-    fxCoin = LoadSound("resources/coin.wav");
-
-    SetMusicVolume(music, 1.0f);
-    PlayMusicStream(music);
 
 #if defined(PLATFORM_WEB)
     emscripten_set_main_loop(UpdateDrawFrame, 60, 1);
@@ -73,11 +68,6 @@ int main(void)
     // De-Initialization
     //--------------------------------------------------------------------------------------
     // Unload global data loaded
-    UnloadFont(font);
-    UnloadMusicStream(music);
-    UnloadSound(fxCoin);
-
-    CloseAudioDevice();     // Close audio context
 
     CloseWindow();          // Close window and OpenGL context
     //--------------------------------------------------------------------------------------
@@ -90,15 +80,18 @@ static void UpdateDrawFrame(void)
 {
     // Update
     //----------------------------------------------------------------------------------
-    UpdateMusicStream(music);       // NOTE: Music keeps playing between screens
+    PlayerUpdate(&player);
+    // PlayerDebug(&player);
+
     //----------------------------------------------------------------------------------
     // Draw
     //----------------------------------------------------------------------------------
     BeginDrawing();
 
-    ClearBackground(RAYWHITE);
+    ClearBackground(WHITE);
 
-    //DrawFPS(10, 10);
+    DrawWorld();
+    PlayerDraw(&player);
 
     EndDrawing();
     //----------------------------------------------------------------------------------
