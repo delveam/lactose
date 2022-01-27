@@ -40,6 +40,7 @@ release: build/index.html
 .PHONY: format
 format:
 	astyle -n -xC100 -S -xb -j --style=allman --recursive "src/*.c,*.h"
+	prettier --write --use-tabs src/minshell.html
 
 .PHONY: clean
 clean:
