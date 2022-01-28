@@ -12,7 +12,6 @@
 *
 ********************************************************************************************/
 #include "raylib.h"
-#include "player.h"
 #include "grid.h"
 
 #if defined(PLATFORM_WEB)
@@ -30,8 +29,6 @@
 static const int screenWidth = 256;
 static const int screenHeight = 256;
 
-static Player player;
-
 //----------------------------------------------------------------------------------
 // Local Functions Declaration
 //----------------------------------------------------------------------------------
@@ -48,7 +45,6 @@ int main(void)
     InitWindow(screenWidth, screenHeight, "raylib game template");
 
     InitWorld();
-    PlayerInit(&player, 2, 2, 8);
 
     // Load global data (assets that must be available in all screens, i.e. font)
 
@@ -80,8 +76,7 @@ static void UpdateDrawFrame(void)
 {
     // Update
     //----------------------------------------------------------------------------------
-    PlayerUpdate(&player);
-    // PlayerDebug(&player);
+    UpdateWorld();
 
     //----------------------------------------------------------------------------------
     // Draw
@@ -91,7 +86,6 @@ static void UpdateDrawFrame(void)
     ClearBackground(WHITE);
 
     DrawWorld();
-    PlayerDraw(&player);
 
     EndDrawing();
     //----------------------------------------------------------------------------------
