@@ -12,10 +12,39 @@ void PlayerInit(Player* player, int x, int y, float size)
     Vector2 rectPos = GridToScreen(x, y);
     player->rect.x = rectPos.x - size * 0.5;
     player->rect.y = rectPos.y - size * 0.5;
+
+    player->facing = DOWN;
 }
 
-void PlayerMove(Player* player, int dx, int dy)
+void PlayerMove(Player* player, Direction direction)
 {
+    int dx = 0;
+    int dy = 0;
+
+    switch (direction)
+    {
+        case LEFT:
+        {
+            dx = -1;
+            break;
+        }
+        case UP:
+        {
+            dy = -1;
+            break;
+        }
+        case RIGHT:
+        {
+            dx = 1;
+            break;
+        }
+        case DOWN:
+        {
+            dy = 1;
+            break;
+        }
+    }
+
     int newX = player->pos.x + dx;
     int newY = player->pos.y + dy;
 
@@ -32,25 +61,27 @@ void PlayerMove(Player* player, int dx, int dy)
     Vector2 newRectPos = GridToScreen(newX, newY);
     player->rect.x = newRectPos.x - player->rect.width * 0.5;
     player->rect.y = newRectPos.y - player->rect.height * 0.5;
+
+    player->facing = direction;
 }
 
 static void Input(Player* player)
 {
     if (IsKeyPressed(KEY_UP))
     {
-        PlayerMove(player, 0, -1);
+        PlayerMove(player, UP);
     }
     else if (IsKeyPressed(KEY_DOWN))
     {
-        PlayerMove(player, 0, 1);
+        PlayerMove(player, DOWN);
     }
     else if (IsKeyPressed(KEY_LEFT))
     {
-        PlayerMove(player, -1, 0);
+        PlayerMove(player, LEFT);
     }
     else if (IsKeyPressed(KEY_RIGHT))
     {
-        PlayerMove(player, 1, 0);
+        PlayerMove(player, RIGHT);
     }
 }
 
@@ -62,6 +93,34 @@ void PlayerUpdate(Player* player)
 void PlayerDraw(Player* player)
 {
     DrawRectangleRec(player->rect, RED);
+
+    Rectangle tmp = player->rect;
+
+    switch (player->facing)
+    {
+        case LEFT:
+        {
+            tmp.x -= GRID_SIZE;
+            break;
+        }
+        case UP:
+        {
+            tmp.y -= GRID_SIZE;
+            break;
+        }
+        case RIGHT:
+        {
+            tmp.x += GRID_SIZE;
+            break;
+        }
+        case DOWN:
+        {
+            tmp.y += GRID_SIZE;
+            break;
+        }
+    }
+
+    DrawRectangleRec(tmp, BLUE);
 }
 
 void PlayerDebug(Player* player)
