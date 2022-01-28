@@ -1,6 +1,39 @@
 #include <stdio.h>
 #include "player.h"
 
+static Coord GetFront(Player* player)
+{
+    // WARNING: Can return out of bounds!
+
+    Coord result = player->pos;
+
+    switch (player->facing)
+    {
+        case LEFT:
+        {
+            result.x -= 1;
+            break;
+        }
+        case UP:
+        {
+            result.y -= 1;
+            break;
+        }
+        case RIGHT:
+        {
+            result.x += 1;
+            break;
+        }
+        case DOWN:
+        {
+            result.y += 1;
+            break;
+        }
+    }
+
+    return result;
+}
+
 void PlayerInit(Player* player, int x, int y, float size)
 {
     player->pos.x = x;
@@ -14,6 +47,9 @@ void PlayerInit(Player* player, int x, int y, float size)
     player->rect.y = rectPos.y - size * 0.5;
 
     player->facing = DOWN;
+    player->holding = EMPTY;
+    player->pickUpCoord.x = -1;
+    player->pickUpCoord.y = -1;
 }
 
 void PlayerMove(Player* player, Direction direction)
@@ -83,6 +119,44 @@ static void Input(Player* player)
     {
         PlayerMove(player, RIGHT);
     }
+
+    if (IsKeyPressed(KEY_SPACE))
+    {
+        Coord front = GetFront(player);
+        Cell frontCell = GetCell(front.x, front.y);
+
+        if (player->holding != EMPTY)
+        {
+            // Player is holding something
+            if (frontCell == DROPOFF)
+            {
+                // Player in front of drop off
+                if (player->holdingId == PickUpLookUp(front.x, front.y))
+                {
+                    // Player has successfully dropped off the parcel.
+                    player->holding = EMPTY;
+                    player->holdingId = 0;
+
+                    DecrementPickUpCount(player->pickUpCoord.x, player->pickUpCoord.y);
+                }
+            }
+            else if (frontCell != PICKUP)
+            {
+                // Player not in front of pickup
+                // TODO: ideally, would throw item in front, but for now throw into void
+                player->holding = EMPTY;
+                player->holdingId = 0;
+            }
+        }
+        else if (frontCell == PICKUP && GetPickUpCount(front.x, front.y) > 0)
+        {
+            // Player is not holding something and there is an item to pickup
+            player->holding = PARCEL;
+            player->holdingId = PickUpLookUp(front.x, front.y);
+            player->pickUpCoord.x = front.x;
+            player->pickUpCoord.y = front.y;
+        }
+    }
 }
 
 void PlayerUpdate(Player* player)
@@ -121,9 +195,15 @@ void PlayerDraw(Player* player)
     }
 
     DrawRectangleRec(tmp, BLUE);
+
+    if (player->holding)
+    {
+        DrawText("HOLDING", 8, 8, 8, BLACK);
+    }
 }
 
 void PlayerDebug(Player* player)
 {
-    printf("(%d, %d)\n", player->pos.x, player->pos.y);
+    // printf("(%d, %d)\n", player->pos.x, player->pos.y);
+    printf("%d\n", player->holding);
 }

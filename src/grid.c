@@ -1,11 +1,14 @@
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include "player.h"
 #include "grid.h"
 
-static Cell map[GRID_WIDTH * GRID_HEIGHT];
-static Fart zone[GRID_WIDTH * GRID_HEIGHT];
-static Fart zoneBackBuffer[GRID_WIDTH * GRID_HEIGHT];
+static Cell map[GRID_AREA];
+static Fart zone[GRID_AREA];
+static Fart zoneBackBuffer[GRID_AREA];
+static int pickUpIds[GRID_AREA];
+static int pickUpCounts[GRID_AREA];
 static int turns = 0;
 static float timer = 0;
 
@@ -17,7 +20,7 @@ void InitWorld()
     Cell mapTemp[] =
     {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0,
@@ -29,8 +32,8 @@ void InitWorld()
         0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 2, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     };
 
@@ -54,12 +57,54 @@ void InitWorld()
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     };
 
-    memcpy(map, mapTemp, sizeof(Cell) * GRID_WIDTH * GRID_HEIGHT);
-    memcpy(zone, zoneTmp, sizeof(Fart) * GRID_WIDTH * GRID_HEIGHT);
+    int pickUpIdsTmp[] =
+    {
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    };
+
+    int pickUpCountsTmp[] =
+    {
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    };
+
+    memcpy(map, mapTemp, sizeof(Cell) * GRID_AREA);
+    memcpy(zone, zoneTmp, sizeof(Fart) * GRID_AREA);
+    memcpy(zoneBackBuffer, zoneTmp, sizeof(Fart) * GRID_AREA);
+    memcpy(pickUpIds, pickUpIdsTmp, sizeof(int) * GRID_AREA);
+    memcpy(pickUpCounts, pickUpCountsTmp, sizeof(int) * GRID_AREA);
 
     turns = 0;
     timer = 0.0f;
-
 
     PlayerInit(&player, 2, 2, 8);
     fartFrequency = 0.0f;
@@ -71,28 +116,34 @@ void FartHere(int x, int y)
 }
 
 static void CleanUpSmallFarts()
+{
+    for (int y = 0; y < GRID_HEIGHT; ++y)
     {
-        for (int y = 0; y < GRID_HEIGHT; ++y)
+        for (int x = 0; x < GRID_WIDTH; ++x)
         {
-            for (int x = 0; x < GRID_WIDTH; ++x)
-            {
             if (GetFart(zone, x, y) == SMALL)
-                {
+            {
                 SetFart(zone, x, y, AIR);
             }
         }
     }
 
 }
-                    {
-                        SetFart(zoneBackBuffer, x, y, SMALL);
 
-                        if (GetFart(zoneBackBuffer, x, y - 1) == SMALL)
-                        {
-                            SetFart(zoneBackBuffer, x, y - 1, BIG);
-                        }
+static int DeliveredAll()
+{
+    int sum = 0;
+
+    for (int i = 0; i < GRID_AREA; ++i)
+    {
+        sum += pickUpCounts[i];
+    }
+
+    return !sum;
+}
+
 static void ExpandBigFart(Fart* targetZone, int x, int y)
-                        {
+{
     assert(GetFart(targetZone, x, y) == BIG);
 
     Fart topFart = GetFart(targetZone, x, y - 1);
@@ -108,43 +159,43 @@ static void ExpandBigFart(Fart* targetZone, int x, int y)
     else if (topFart == AIR)
     {
         SetFart(targetZone, x, y - 1, SMALL);
-                        }
+    }
 
     // bottom
     if (botFart == SMALL)
-                        {
+    {
         SetFart(targetZone, x, y + 1, BIG);
-                        }
+    }
     else if (botFart == AIR)
-                        {
+    {
         SetFart(targetZone, x, y + 1, SMALL);
-                        }
+    }
 
     // left
     if (leftFart == SMALL)
-                        {
+    {
         SetFart(targetZone, x - 1, y, BIG);
-                        }
+    }
     else if (leftFart == AIR)
-                        {
+    {
         SetFart(targetZone, x - 1, y, SMALL);
-                        }
+    }
 
     // right
     if (rightFart == SMALL)
-                        {
+    {
         SetFart(targetZone, x + 1, y, BIG);
-                        }
+    }
     else if (rightFart == AIR)
-                        {
+    {
         SetFart(targetZone, x + 1, y, SMALL);
-                        }
+    }
 
     SetFart(targetZone, x, y, SMALL);
-                    }
+}
 
 static void ProcessBigFarts()
-                    {
+{
     for (int y = 0; y < GRID_HEIGHT; ++y)
     {
         for (int x = 0; x < GRID_WIDTH; ++x)
@@ -152,9 +203,13 @@ static void ProcessBigFarts()
             if (GetFart(zoneBackBuffer, x, y) == BIG)
             {
                 ExpandBigFart(zone, x, y);
-                    }
-                }
             }
+        }
+    }
+
+    memcpy(zoneBackBuffer, zone, sizeof(Fart) * GRID_AREA);
+}
+
 void UpdateWorld()
 {
     // TODO(thismarvin): `turns` property
@@ -167,7 +222,7 @@ void UpdateWorld()
     if (DeliveredAll())
     {
         // TODO(thismarvin): Acknowledge that the player has finished their job!
-        }
+    }
 
     timer += GetFrameTime();
     fartFrequency += GetFrameTime();
@@ -180,6 +235,7 @@ void UpdateWorld()
         timer = 0;
     }
 
+    // TODO: move this in player
     if (fartFrequency >= 1.0f)
     {
         int dx = 0;
@@ -225,22 +281,18 @@ void DrawWorld()
             {
                 case BIG:
                 {
-                    Color color;
-                    color.g = 100;
-                    color.a = 255;
+                    Color color = { 0, 100, 0, 255 };
                     DrawRectangle(x * GRID_SIZE, y * GRID_SIZE, GRID_SIZE, GRID_SIZE, color);
                     break;
                 }
                 case SMALL:
                 {
-                    Color color;
-                    color.g = 200;
-                    color.a = 255;
+                    Color color = { 0, 200, 0, 255 };
                     DrawRectangle(x * GRID_SIZE, y * GRID_SIZE, GRID_SIZE, GRID_SIZE, color);
                     break;
                 }
                 default:
-                break;
+                    break;
             }
         }
     }
@@ -249,9 +301,19 @@ void DrawWorld()
     {
         for (int x = 0; x < GRID_WIDTH; ++x)
         {
-            if (map[y * GRID_WIDTH + x] == WALL)
+            switch (map[y * GRID_WIDTH + x])
             {
-                DrawRectangle(x * GRID_SIZE, y * GRID_SIZE, GRID_SIZE, GRID_SIZE, BLACK);
+                case WALL:
+                    DrawRectangle(x * GRID_SIZE, y * GRID_SIZE, GRID_SIZE, GRID_SIZE, BLACK);
+                    break;
+                case DROPOFF:
+                    DrawRectangle(x * GRID_SIZE, y * GRID_SIZE, GRID_SIZE, GRID_SIZE, RED);
+                    break;
+                case PICKUP:
+                    DrawRectangle(x * GRID_SIZE, y * GRID_SIZE, GRID_SIZE, GRID_SIZE, ORANGE);
+                    break;
+                default:
+                    break;
             }
         }
     }
@@ -269,24 +331,24 @@ Cell GetCell(int x, int y)
     return map[y * GRID_WIDTH + x];
 }
 
-Fart GetFart(Fart* self, int x, int y)
+Fart GetFart(Fart* targetZone, int x, int y)
 {
     if (x >= GRID_WIDTH || x < 0 || y >= GRID_HEIGHT || y < 0)
     {
         return AIR;
     }
 
-    return self[y * GRID_WIDTH + x];
+    return targetZone[y * GRID_WIDTH + x];
 }
 
-void SetFart(Fart* help, int x, int y, Fart value)
+void SetFart(Fart* targetZone, int x, int y, Fart value)
 {
     if (x >= GRID_WIDTH || x < 0 || y >= GRID_HEIGHT || y < 0)
     {
         return;
     }
 
-    help[y * GRID_WIDTH + x] = value;
+    targetZone[y * GRID_WIDTH + x] = value;
 }
 
 Coord ScreenToGrid(float x, float y)
@@ -305,4 +367,25 @@ Vector2 GridToScreen(int x, int y)
 
     Vector2 result = { xScreen, yScreen };
     return result;
+}
+
+int PickUpLookUp(int x, int y)
+{
+    return pickUpIds[y * GRID_WIDTH + x];
+}
+
+int GetPickUpCount(int x, int y)
+{
+    return pickUpCounts[y * GRID_WIDTH + x];
+}
+
+void DecrementPickUpCount(int x, int y)
+{
+    int tmp = pickUpCounts[y * GRID_WIDTH + x] - 1;
+
+    tmp = MAX(0, tmp);
+
+    printf("%d\n", tmp);
+
+    pickUpCounts[y * GRID_WIDTH + x] = tmp;
 }
