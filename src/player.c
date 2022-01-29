@@ -125,7 +125,7 @@ static void Input(Player* player)
     if (IsKeyPressed(KEY_SPACE))
     {
         Coord front = GetFront(player);
-        Cell frontCell = GetCell(front.x, front.y);
+        Cell frontCell = GetTask(front.x, front.y);
 
         if (player->holding != EMPTY)
         {

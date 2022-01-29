@@ -32,6 +32,7 @@ typedef enum
 void InitWorld();
 void DestroyWorld();
 Cell GetCell(int x, int y);
+Cell GetTask(int x, int y);
 Fart GetFart(Fart* self, int x, int y);
 void SetFart(Fart* help, int x, int y, Fart value);
 Coord ScreenToGrid(float x, float y);
