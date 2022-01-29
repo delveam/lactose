@@ -14,6 +14,7 @@ static float timer = 0;
 
 static Player player;
 static float fartFrequency;
+static Camera2D camera;
 
 void InitWorld()
 {
@@ -218,7 +219,22 @@ void UpdateWorld()
     PlayerUpdate(&player);
     // PlayerDebug(&player);
 
+    // Update Camera
+    {
+        int viewportWidth = 16;
+        int viewportHeight = 16;
 
+        camera.offset.x = (-player.pos.x * GRID_SIZE + viewportWidth * 0.5 * GRID_SIZE) * camera.zoom;
+        camera.offset.y = (-player.pos.y * GRID_SIZE + viewportHeight * 0.5 * GRID_SIZE) * camera.zoom;
+
+        // printf("(%f, %f)\n", camera.offset.x, camera.offset.y);
+
+        camera.offset.x = MIN(0, camera.offset.x);
+        camera.offset.x = MAX((-(GRID_WIDTH - viewportWidth) * GRID_SIZE) * camera.zoom, camera.offset.x);
+
+        camera.offset.y = MIN(0, camera.offset.y);
+        camera.offset.y = MAX((-(GRID_HEIGHT - viewportHeight) * GRID_SIZE) * camera.zoom, camera.offset.y);
+    }
     if (DeliveredAll())
     {
         // TODO(thismarvin): Acknowledge that the player has finished their job!
