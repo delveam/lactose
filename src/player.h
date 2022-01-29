@@ -24,7 +24,7 @@ typedef struct
 void PlayerInit(Player* player, int x, int y, float size);
 void PlayerMove(Player* player, Direction direction);
 void PlayerUpdate(Player* player);
-void PlayerDraw(Player* player, Texture2D sprites);
+void PlayerRegisterDraw(Player* player);
 void PlayerDebug(Player* player);
 
 #endif

@@ -3,6 +3,7 @@
 #include "player.h"
 #include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
@@ -38,6 +39,8 @@ static float fartFrequencyStopwatch;
 
 static Camera2D camera;
 static Texture2D sprites;
+static DrawJob drawJobs[GRID_AREA * 3] = { 0 };
+static int nextDrawJobIdx;
 
 static void AddCoworker(Coord startPos, Coord endPos);
 
@@ -104,6 +107,12 @@ void InitWorld()
     Coord startPos = { 5, 18 };
     Coord endPos = { 15, 18 };
     AddCoworker(startPos, endPos);
+}
+
+void RegisterDraw(DrawJob job)
+{
+    *(drawJobs + nextDrawJobIdx) = job;
+    ++nextDrawJobIdx;
 }
 
 void DestroyWorld()
@@ -304,6 +313,26 @@ void UpdateWorld()
     }
 }
 
+static int DrawComp(const void* elem1, const void* elem2)
+{
+    DrawJob* job1 = ((DrawJob*) elem1);
+    DrawJob* job2 = ((DrawJob*) elem2);
+    float bot1 = job1->layer * GRID_HEIGHT * GRID_SIZE + (job1->pos.y + job1->source.height) + 0.1 *
+                 job1->pos.x;
+    float bot2 = job2->layer * GRID_HEIGHT * GRID_SIZE + (job2->pos.y + job2->source.height) + 0.1 *
+                 job1->pos.x;
+
+    if (bot1 > bot2)
+    {
+        return 1;
+    }
+    if (bot1 < bot2)
+    {
+        return -1;
+    }
+    return 0;
+}
+
 void DrawWorld()
 {
     BeginMode2D(camera);
@@ -328,7 +357,8 @@ void DrawWorld()
 
                 Rectangle source = { i * spriteSize, j * spriteSize, spriteSize, spriteSize };
                 Vector2 position = { x * spriteSize, y * spriteSize };
-                DrawTextureRec(sprites, source, position, WHITE);
+                DrawJob job = { source, position, WHITE, 0 };
+                RegisterDraw(job);
             }
         }
     }
@@ -353,7 +383,8 @@ void DrawWorld()
 
                 Rectangle source = { i * spriteSize, j * spriteSize, spriteSize, spriteSize };
                 Vector2 position = { x * spriteSize, y * spriteSize };
-                DrawTextureRec(sprites, source, position, WHITE);
+                DrawJob job = { source, position, WHITE, 1 };
+                RegisterDraw(job);
             }
         }
     }
@@ -378,7 +409,8 @@ void DrawWorld()
 
                 Rectangle source = { i * spriteSize, j * spriteSize, spriteSize, spriteSize };
                 Vector2 position = { x * spriteSize, y * spriteSize };
-                DrawTextureRec(sprites, source, position, WHITE);
+                DrawJob job = { source, position, WHITE, 2 };
+                RegisterDraw(job);
             }
         }
     }
@@ -403,7 +435,8 @@ void DrawWorld()
 
                 Rectangle source = { i * spriteSize, j * spriteSize, spriteSize, spriteSize };
                 Vector2 position = { x * spriteSize, y * spriteSize };
-                DrawTextureRec(sprites, source, position, WHITE);
+                DrawJob job = { source, position, WHITE, 2 };
+                RegisterDraw(job);
             }
         }
     }
@@ -412,11 +445,11 @@ void DrawWorld()
     {
         for (int i = 0; i < nextCoworkerIdx; i++)
         {
-            CoworkerDraw(coworkers + i, sprites);
+            CoworkerRegisterDraw(coworkers + i);
         }
     }
 
-    PlayerDraw(&player, sprites);
+    PlayerRegisterDraw(&player);
 
     // Draw Farts.
     {
@@ -432,14 +465,16 @@ void DrawWorld()
                     {
                         Rectangle source = { 176, 112, spriteSize, spriteSize };
                         Vector2 position = { x * spriteSize, y * spriteSize };
-                        DrawTextureRec(sprites, source, position, color);
+                        DrawJob job = { source, position, color, 3 };
+                        RegisterDraw(job);
                         break;
                     }
                     case SMALL:
                     {
                         Rectangle source = { 176 + 16, 112, spriteSize, spriteSize };
                         Vector2 position = { x * spriteSize, y * spriteSize };
-                        DrawTextureRec(sprites, source, position, color);
+                        DrawJob job = { source, position, color, 3 };
+                        RegisterDraw(job);
                         break;
                     }
                     default:
@@ -448,6 +483,17 @@ void DrawWorld()
             }
         }
     }
+
+    // Sort draw jobs
+    qsort(drawJobs, nextDrawJobIdx, sizeof(DrawJob), DrawComp);
+    // Execute all draw jobs
+    for (int i = 0; i < nextDrawJobIdx; ++i)
+    {
+        DrawJob job = drawJobs[i];
+        DrawTextureRec(sprites, job.source, job.pos, job.tint);
+    }
+    // Clear draw jobs
+    nextDrawJobIdx = 0;
 
     EndMode2D();
 

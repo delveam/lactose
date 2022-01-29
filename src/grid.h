@@ -2,6 +2,7 @@
 #define GRID_H
 
 #include "raylib.h"
+#include "constants.h"
 
 #define GRID_WIDTH 32
 #define GRID_HEIGHT 32
@@ -44,5 +45,6 @@ void DecrementPickUpCount(int x, int y);
 void UpdateWorld();
 void DrawWorld();
 void IncrementTurns();
+void RegisterDraw(DrawJob job);
 
 #endif

@@ -166,7 +166,7 @@ void PlayerUpdate(Player* player)
     Input(player);
 }
 
-void PlayerDraw(Player* player, Texture2D sprites)
+void PlayerRegisterDraw(Player* player)
 {
     // (10, 35), 12x12
     {
@@ -197,7 +197,8 @@ void PlayerDraw(Player* player, Texture2D sprites)
         }
 
         Vector2 position = { player->pos.x * GRID_SIZE - 10 + 3, player->pos.y * GRID_SIZE - 35 + 3 };
-        DrawTextureRec(sprites, source, position, WHITE);
+        DrawJob job = { source, position, WHITE, 2 };
+        RegisterDraw(job);
     }
 
     // DrawRectangleRec(player->rect, RED);
