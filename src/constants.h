@@ -4,6 +4,8 @@
 #define MAX(a,b) (((a)>(b))?(a):(b))
 #define MIN(a,b) (((a)<(b))?(a):(b))
 
+#define MAX_COWORKERS 32
+
 typedef enum
 {
     LEFT = 0,

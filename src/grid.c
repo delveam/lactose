@@ -1,8 +1,10 @@
 #include "grid.h"
+#include "coworker.h"
 #include "player.h"
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 // TODO(thismarvin): We do not need this anymore; remove it and use GRID_WIDTH/GRID_HEIGHT;
 static const int mapWidth = 32;
@@ -28,12 +30,16 @@ static int turns = 0;
 static float fartUpdateStopwatch = 0;
 
 static Player player;
+static Coworker coworkers[MAX_COWORKERS] = { 0 };
+static int nextCoworkerIdx = 0;
 static float fartOverloadStopwatch;
 static float fartCooldownStopwatch;
 static float fartFrequencyStopwatch;
 
 static Camera2D camera;
 static Texture2D sprites;
+
+static void AddCoworker(Coord startPos, Coord endPos);
 
 void InitWorld()
 {
@@ -92,6 +98,12 @@ void InitWorld()
     fartOverloadStopwatch = 0.0f;
     fartCooldownStopwatch = 0.0f;
     fartFrequencyStopwatch = 0.0f;
+
+    SetRandomSeed(time(0));
+
+    Coord startPos = { 5, 18 };
+    Coord endPos = { 5, 5 };
+    AddCoworker(endPos, endPos);
 }
 
 void DestroyWorld()
@@ -238,6 +250,14 @@ void UpdateWorld()
         }
     }
 
+    // Update Coworkers
+    {
+        for (int i = 0; i < nextCoworkerIdx; i++)
+        {
+            CoworkerUpdate(coworkers + i);
+        }
+    }
+
     // Update... Player's Fart Logic...
     {
         // TODO(thismarvin): Move this to player?
@@ -245,10 +265,7 @@ void UpdateWorld()
 
         if (fartOverloadStopwatch >= 8.0f)
         {
-            fartCooldownStopwatch += GetFrameTime();
-
-            if (fartCooldownStopwatch >= 4.0f)
-            {
+            fartCooldownStopwatch += GetFrameTime(); if (fartCooldownStopwatch >= 4.0f) {
                 fartOverloadStopwatch = 0.0f;
                 fartCooldownStopwatch = 0.0f;
                 fartFrequencyStopwatch = 0.0f;
@@ -386,6 +403,14 @@ void DrawWorld()
                 Vector2 position = { x * spriteSize, y * spriteSize };
                 DrawTextureRec(sprites, source, position, WHITE);
             }
+        }
+    }
+
+    // Draw Coworkers
+    {
+        for (int i = 0; i < nextCoworkerIdx; i++)
+        {
+            CoworkerDraw(coworkers + i);
         }
     }
 
@@ -529,4 +554,15 @@ void DecrementPickUpCount(int x, int y)
 void IncrementTurns()
 {
     turns += 1;
+}
+
+static void AddCoworker(Coord startPos, Coord endPos)
+{
+    Coworker* cw = coworkers + nextCoworkerIdx;
+    int minMove = 1, maxMove = 3;
+    int minWait = 2, maxWait = 4;
+    float moveDuration = (maxMove - minMove) * (GetRandomValue(0, 1000) / 1000.0f) + minMove;
+    float waitDuration = (maxWait - minWait) * (GetRandomValue(0, 1000) / 1000.0f) + minWait;
+    CoworkerInit(cw, 1, 4, startPos, endPos, GRID_SIZE);
+    ++nextCoworkerIdx;
 }
