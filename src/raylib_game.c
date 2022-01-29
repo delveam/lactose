@@ -44,6 +44,8 @@ int main(void)
     //---------------------------------------------------------
     InitWindow(screenWidth, screenHeight, "raylib game template");
 
+    InitAudioDevice();
+
     InitWorld();
 
     // Load global data (assets that must be available in all screens, i.e. font)
@@ -64,6 +66,8 @@ int main(void)
     // De-Initialization
     //--------------------------------------------------------------------------------------
     // Unload global data loaded
+    CloseAudioDevice();
+
     DestroyWorld();
 
     CloseWindow();          // Close window and OpenGL context

@@ -28,6 +28,7 @@ static int pickUpCounts[GRID_AREA];
 static Fart zone[GRID_AREA] = { 0 };
 static Fart zoneBackBuffer[GRID_AREA] = { 0 };
 static int turns = 0;
+static int turnNeedsToBeResolved = 0;
 static float fartUpdateStopwatch = 0;
 
 static Player player;
@@ -41,6 +42,9 @@ static Camera2D camera;
 static Texture2D sprites;
 static DrawJob drawJobs[GRID_AREA * 3] = { 0 };
 static int nextDrawJobIdx;
+
+static Sound fartSounds[3];
+static Music bgm;
 
 static void AddCoworker(Coord startPos, Coord endPos);
 
@@ -57,9 +61,24 @@ void InitWorld()
     }
 
     sprites = LoadTexture("src/resources/sprites.png");
+    fartSounds[0] = LoadSound("src/resources/fart_0.mp3");
+    fartSounds[1] = LoadSound("src/resources/fart_1.mp3");
+    fartSounds[2] = LoadSound("src/resources/fart_2.mp3");
+    bgm = LoadMusicStream("src/resources/bgm.mp3");
 
     // NOTE: The following line if only for debugging...
     // sprites = LoadTexture("resources/sprites.png");
+    // fartSounds[0] = LoadSound("resources/fart_0.mp3");
+    // fartSounds[1] = LoadSound("resources/fart_1.mp3");
+    // fartSounds[2] = LoadSound("resources/fart_2.mp3");
+    // bgm = LoadMusicStream("resources/bgm.wav");
+
+    SetSoundVolume(fartSounds[0], 0.2f);
+    SetSoundVolume(fartSounds[1], 0.2f);
+    SetSoundVolume(fartSounds[2], 0.2f);
+
+    SetMusicVolume(bgm, 0.05f);
+    PlayMusicStream(bgm);
 
     {
         int tmp[] = { 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 36, 36, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 51, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 52, 52, 51, 50, 50, 50, 50, 50, 51, 50, 50, 50, 50, 50, 50, 50, 50, 50, 51, 51, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 68, 68, 51, 66, 66, 66, 66, 66, 67, 66, 66, 66, 66, 66, 66, 66, 66, 66, 51, 51, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 51, 0, 0, 0, 0, 0, 83, 0, 0, 0, 0, 0, 0, 0, 0, 0, 51, 51, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 51, 0, 0, 0, 0, 0, 99, 0, 0, 0, 0, 0, 0, 0, 0, 0, 51, 51, 0, 0, 0, 0, 0, 0, 23, 24, 0, 0, 23, 24, 0, 0, 51, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 51, 51, 0, 0, 0, 0, 0, 0, 39, 40, 0, 0, 39, 40, 0, 0, 51, 0, 0, 0, 0, 0, 101, 36, 36, 36, 36, 36, 36, 36, 36, 36, 51, 51, 0, 0, 0, 0, 0, 0, 55, 56, 0, 0, 55, 56, 0, 0, 51, 0, 0, 0, 0, 0, 67, 52, 52, 52, 52, 52, 52, 52, 52, 52, 51, 51, 0, 0, 0, 0, 0, 0, 71, 72, 0, 0, 71, 72, 0, 0, 51, 0, 0, 0, 0, 0, 83, 68, 68, 68, 68, 68, 68, 68, 68, 68, 51, 51, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 51, 0, 0, 0, 0, 0, 99, 0, 0, 0, 0, 0, 0, 0, 0, 0, 51, 51, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 51, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 51, 35, 36, 37, 38, 0, 0, 0, 33, 34, 36, 36, 36, 36, 36, 36, 35, 36, 36, 36, 36, 36, 36, 36, 36, 37, 0, 0, 0, 33, 36, 34, 35, 51, 52, 53, 54, 0, 0, 0, 49, 50, 52, 52, 52, 52, 52, 52, 51, 52, 52, 52, 52, 52, 51, 52, 52, 53, 0, 0, 0, 49, 52, 50, 51, 51, 68, 69, 70, 0, 0, 0, 65, 66, 68, 68, 68, 68, 68, 68, 51, 68, 68, 68, 68, 68, 51, 68, 68, 69, 0, 0, 0, 65, 68, 66, 51, 67, 84, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 67, 0, 0, 0, 0, 0, 67, 0, 0, 0, 0, 0, 0, 0, 0, 0, 67, 83, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 83, 0, 0, 0, 0, 0, 83, 0, 0, 0, 0, 0, 0, 0, 0, 0, 83, 99, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 99, 0, 0, 0, 0, 0, 99, 0, 0, 0, 0, 0, 0, 0, 0, 0, 99, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 36, 37, 0, 0, 0, 0, 0, 33, 34, 34, 34, 34, 34, 34, 34, 34, 34, 36, 51, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 52, 53, 0, 0, 0, 0, 0, 49, 50, 50, 52, 50, 50, 50, 50, 50, 50, 51, 51, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 68, 69, 0, 0, 0, 0, 0, 65, 66, 66, 68, 66, 66, 66, 66, 66, 66, 51, 51, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 51, 51, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 51, 51, 0, 0, 23, 24, 0, 0, 23, 24, 0, 0, 23, 24, 0, 0, 3, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 51, 51, 0, 0, 39, 40, 0, 0, 39, 40, 0, 0, 39, 40, 0, 0, 19, 0, 0, 0, 0, 0, 19, 0, 0, 0, 0, 0, 0, 0, 0, 0, 51, 51, 0, 0, 55, 56, 0, 0, 55, 56, 0, 0, 55, 56, 0, 0, 19, 0, 0, 0, 0, 0, 19, 0, 0, 0, 0, 0, 0, 0, 0, 0, 51, 51, 0, 0, 71, 72, 0, 0, 71, 72, 0, 0, 71, 72, 0, 0, 19, 0, 0, 0, 0, 0, 19, 0, 0, 0, 0, 0, 0, 0, 0, 0, 51, 51, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 19, 0, 0, 0, 0, 0, 19, 0, 0, 0, 0, 0, 0, 0, 0, 0, 51 };
@@ -118,6 +137,13 @@ void RegisterDraw(DrawJob job)
 void DestroyWorld()
 {
     UnloadTexture(sprites);
+
+    for (int i = 0; i < 3; ++i)
+    {
+        UnloadSound(fartSounds[i]);
+    }
+
+    UnloadMusicStream(bgm);
 }
 
 void FartHere(int x, int y)
@@ -222,6 +248,8 @@ static void ProcessBigFarts()
 
 void UpdateWorld()
 {
+    UpdateMusicStream(bgm);
+
     PlayerUpdate(&player);
 
     // Update Camera
@@ -250,7 +278,7 @@ void UpdateWorld()
     {
         fartUpdateStopwatch += GetFrameTime();
 
-        if (fartUpdateStopwatch >= 1.0f)
+        if (fartUpdateStopwatch >= 2.0f)
         {
             CleanUpSmallFarts();
             ProcessBigFarts();
@@ -272,10 +300,10 @@ void UpdateWorld()
         // TODO(thismarvin): Move this to player?
         fartOverloadStopwatch += GetFrameTime();
 
-        if (fartOverloadStopwatch >= 8.0f)
+        if (fartOverloadStopwatch >= 5.0f)
         {
             fartCooldownStopwatch += GetFrameTime();
-            if (fartCooldownStopwatch >= 4.0f)
+            if (fartCooldownStopwatch >= 6.0f)
             {
                 fartOverloadStopwatch = 0.0f;
                 fartCooldownStopwatch = 0.0f;
@@ -284,7 +312,7 @@ void UpdateWorld()
 
             fartFrequencyStopwatch += GetFrameTime();
 
-            if (fartFrequencyStopwatch >= 2.0f || turns % 4 == 0)
+            if (fartFrequencyStopwatch >= 1.5f || (turnNeedsToBeResolved && turns % 4 == 0))
             {
                 int dx = 0;
                 int dy = 0;
@@ -307,7 +335,12 @@ void UpdateWorld()
 
                 SetFart(zone, player.pos.x + dx, player.pos.y + dy, BIG);
 
+                int index = GetRandomValue(0, 2);
+
+                PlaySound(fartSounds[index]);
+
                 fartFrequencyStopwatch = 0.0;
+                turnNeedsToBeResolved = 0;
             }
         }
     }
@@ -602,6 +635,7 @@ void DecrementPickUpCount(int x, int y)
 void IncrementTurns()
 {
     turns += 1;
+    turnNeedsToBeResolved = 1;
 }
 
 static void AddCoworker(Coord startPos, Coord endPos)
