@@ -26,8 +26,8 @@
 //----------------------------------------------------------------------------------
 // Local Variables Definition (local to this module)
 //----------------------------------------------------------------------------------
-static const int screenWidth = 256;
-static const int screenHeight = 256;
+static const int screenWidth = 256 * 3;
+static const int screenHeight = 256 * 3;
 
 //----------------------------------------------------------------------------------
 // Local Functions Declaration
