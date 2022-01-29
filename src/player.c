@@ -196,7 +196,7 @@ void PlayerDraw(Player* player, Texture2D sprites)
             }
         }
 
-        Vector2 position = { player->pos.x * GRID_SIZE - 10, player->pos.y * GRID_SIZE - 35 };
+        Vector2 position = { player->pos.x * GRID_SIZE - 10 + 3, player->pos.y * GRID_SIZE - 35 + 3 };
         DrawTextureRec(sprites, source, position, WHITE);
     }
 
