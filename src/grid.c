@@ -46,6 +46,9 @@ static int nextDrawJobIdx;
 static Sound fartSounds[3];
 static Music bgm;
 
+static Sound fartSounds[3];
+static Music bgm;
+
 static void AddCoworker(Coord startPos, Coord endPos);
 
 void InitWorld()
