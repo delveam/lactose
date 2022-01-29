@@ -23,13 +23,14 @@ typedef struct {
     float moveTimer; // acts as a movement speed
     float waitDuration;
     float waitTimer;
-    Direction direction;
+    Direction facing;
     WalkDir walkDirection;
+    int isMan;
 } Coworker;
 
-void CoworkerInit(Coworker* coworker, float moveDuration, float waitDuration, Coord startPos, Coord endPos, float size);
+void CoworkerInit(Coworker* coworker, float moveDuration, float waitDuration, Coord startPos, Coord endPos, float size, int isMan);
 void CoworkerUpdate(Coworker* coworker);
-void CoworkerDraw(Coworker* coworker);
+void CoworkerDraw(Coworker* coworker, Texture2D sprites);
 
 
 #endif
