@@ -3,8 +3,8 @@
 
 #include "raylib.h"
 
-#define GRID_WIDTH 16
-#define GRID_HEIGHT 16
+#define GRID_WIDTH 32
+#define GRID_HEIGHT 32
 #define GRID_AREA GRID_WIDTH * GRID_HEIGHT
 #define GRID_SIZE 16
 
@@ -17,9 +17,9 @@ typedef struct
 typedef enum
 {
     NONE = 0,
-    WALL = 1,
-    PICKUP = 2,
-    DROPOFF = 3
+    WALL = 2,
+    PICKUP = 4,
+    DROPOFF = 5
 } Cell;
 
 typedef enum
@@ -30,6 +30,7 @@ typedef enum
 } Fart;
 
 void InitWorld();
+void DestroyWorld();
 Cell GetCell(int x, int y);
 Fart GetFart(Fart* self, int x, int y);
 void SetFart(Fart* help, int x, int y, Fart value);
@@ -41,5 +42,6 @@ int GetPickUpCount(int x, int y);
 void DecrementPickUpCount(int x, int y);
 void UpdateWorld();
 void DrawWorld();
+void IncrementTurns();
 
 #endif

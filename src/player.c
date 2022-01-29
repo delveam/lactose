@@ -99,6 +99,8 @@ void PlayerMove(Player* player, Direction direction)
     player->rect.y = newRectPos.y - player->rect.height * 0.5;
 
     player->facing = direction;
+
+    IncrementTurns();
 }
 
 static void Input(Player* player)
@@ -164,42 +166,74 @@ void PlayerUpdate(Player* player)
     Input(player);
 }
 
-void PlayerDraw(Player* player)
+void PlayerDraw(Player* player, Texture2D sprites)
 {
-    DrawRectangleRec(player->rect, RED);
-
-    Rectangle tmp = player->rect;
-
-    switch (player->facing)
+    // (10, 35), 12x12
     {
-        case LEFT:
+        Rectangle source = { 0, 128, 32, 48 };
+
+        switch (player->facing)
         {
-            tmp.x -= GRID_SIZE;
-            break;
+            case LEFT:
+            {
+                source.x = 0 + source.width * 0;
+                break;
+            }
+            case UP:
+            {
+                source.x = 0 + source.width * 1;
+                break;
+            }
+            case RIGHT:
+            {
+                source.x = 0 + source.width * 2;
+                break;
+            }
+            case DOWN:
+            {
+                source.x = 0 + source.width * 3;
+                break;
+            }
         }
-        case UP:
-        {
-            tmp.y -= GRID_SIZE;
-            break;
-        }
-        case RIGHT:
-        {
-            tmp.x += GRID_SIZE;
-            break;
-        }
-        case DOWN:
-        {
-            tmp.y += GRID_SIZE;
-            break;
-        }
+
+        Vector2 position = { player->pos.x * GRID_SIZE - 10, player->pos.y * GRID_SIZE - 35 };
+        DrawTextureRec(sprites, source, position, WHITE);
     }
 
-    DrawRectangleRec(tmp, BLUE);
+    // DrawRectangleRec(player->rect, RED);
 
-    if (player->holding)
-    {
-        DrawText("HOLDING", 8, 8, 8, BLACK);
-    }
+    // Rectangle tmp = player->rect;
+    //
+    // switch (player->facing)
+    // {
+    //     case LEFT:
+    //     {
+    //         tmp.x -= GRID_SIZE;
+    //         break;
+    //     }
+    //     case UP:
+    //     {
+    //         tmp.y -= GRID_SIZE;
+    //         break;
+    //     }
+    //     case RIGHT:
+    //     {
+    //         tmp.x += GRID_SIZE;
+    //         break;
+    //     }
+    //     case DOWN:
+    //     {
+    //         tmp.y += GRID_SIZE;
+    //         break;
+    //     }
+    // }
+    //
+    // DrawRectangleRec(tmp, BLUE);
+    //
+    // if (player->holding)
+    // {
+    //     DrawText("HOLDING", 8, 8, 8, BLACK);
+    // }
 }
 
 void PlayerDebug(Player* player)
