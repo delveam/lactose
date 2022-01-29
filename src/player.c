@@ -170,7 +170,7 @@ void PlayerDraw(Player* player, Texture2D sprites)
 {
     // (10, 35), 12x12
     {
-        Rectangle source = { 0, 128, 32, 48 };
+        Rectangle source = { 0, 160, 32, 48 };
 
         switch (player->facing)
         {
