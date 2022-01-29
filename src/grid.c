@@ -102,8 +102,8 @@ void InitWorld()
     SetRandomSeed(time(0));
 
     Coord startPos = { 5, 18 };
-    Coord endPos = { 5, 5 };
-    AddCoworker(endPos, endPos);
+    Coord endPos = { 15, 18 };
+    AddCoworker(startPos, endPos);
 }
 
 void DestroyWorld()
@@ -410,7 +410,7 @@ void DrawWorld()
     {
         for (int i = 0; i < nextCoworkerIdx; i++)
         {
-            CoworkerDraw(coworkers + i);
+            CoworkerDraw(coworkers + i, sprites);
         }
     }
 
@@ -563,6 +563,6 @@ static void AddCoworker(Coord startPos, Coord endPos)
     int minWait = 2, maxWait = 4;
     float moveDuration = (maxMove - minMove) * (GetRandomValue(0, 1000) / 1000.0f) + minMove;
     float waitDuration = (maxWait - minWait) * (GetRandomValue(0, 1000) / 1000.0f) + minWait;
-    CoworkerInit(cw, 1, 4, startPos, endPos, GRID_SIZE);
+    CoworkerInit(cw, 1, 4, startPos, endPos, GRID_SIZE, 0);
     ++nextCoworkerIdx;
 }
