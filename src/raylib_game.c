@@ -64,6 +64,7 @@ int main(void)
     // De-Initialization
     //--------------------------------------------------------------------------------------
     // Unload global data loaded
+    DestroyWorld();
 
     CloseWindow();          // Close window and OpenGL context
     //--------------------------------------------------------------------------------------
