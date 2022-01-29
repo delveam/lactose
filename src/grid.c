@@ -563,6 +563,6 @@ static void AddCoworker(Coord startPos, Coord endPos)
     int minWait = 2, maxWait = 4;
     float moveDuration = (maxMove - minMove) * (GetRandomValue(0, 1000) / 1000.0f) + minMove;
     float waitDuration = (maxWait - minWait) * (GetRandomValue(0, 1000) / 1000.0f) + minWait;
-    CoworkerInit(cw, 1, 4, startPos, endPos, GRID_SIZE, 0);
+    CoworkerInit(cw, moveDuration, waitDuration, startPos, endPos, GRID_SIZE, 0);
     ++nextCoworkerIdx;
 }
