@@ -546,7 +546,7 @@ void DecrementPickUpCount(int x, int y)
 
     tmp = MAX(0, tmp);
 
-    printf("%d\n", tmp);
+    // printf("%d\n", tmp);
 
     pickUpCounts[y * GRID_WIDTH + x] = tmp;
 }
