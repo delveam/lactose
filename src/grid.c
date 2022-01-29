@@ -43,7 +43,7 @@ static Texture2D sprites;
 static Sound fartSounds[3];
 static Music bgm;
 
-static void AddCoworker(Coord startPos, Coord endPos);
+static void AddCoworker(Coord startPos, Coord endPos, int gender);
 
 void InitWorld()
 {
@@ -120,9 +120,39 @@ void InitWorld()
 
     SetRandomSeed(time(0));
 
-    Coord startPos = { 5, 18 };
-    Coord endPos = { 15, 18 };
-    AddCoworker(startPos, endPos);
+    {
+        Coord startPos = { 5, 18 };
+        Coord endPos = { 15, 18 };
+        AddCoworker(startPos, endPos, 0);
+    }
+
+    {
+        Coord startPos = { 10, 4 };
+        Coord endPos = { 10, 9 };
+        AddCoworker(startPos, endPos, 0);
+    }
+
+    {
+        Coord startPos = { 19, 30 };
+        Coord endPos = { 19, 16 };
+        AddCoworker(startPos, endPos, 1);
+    }
+
+    {
+        Coord startPos = { 2, 26 };
+        Coord endPos = { 25, 26 };
+        AddCoworker(startPos, endPos, 1);
+    }
+
+    {
+        Coord pos = { 28, 19 };
+        AddCoworker(pos, pos, GetRandomValue(0, 1));
+    }
+
+    {
+        Coord pos = { 17, 3 };
+        AddCoworker(pos, pos, GetRandomValue(0, 1));
+    }
 }
 
 void DestroyWorld()
@@ -592,13 +622,13 @@ void IncrementTurns()
     turnNeedsToBeResolved = 1;
 }
 
-static void AddCoworker(Coord startPos, Coord endPos)
+static void AddCoworker(Coord startPos, Coord endPos, int gender)
 {
     Coworker* cw = coworkers + nextCoworkerIdx;
     int minMove = 1, maxMove = 3;
     int minWait = 2, maxWait = 4;
     float moveDuration = (maxMove - minMove) * (GetRandomValue(0, 1000) / 1000.0f) + minMove;
     float waitDuration = (maxWait - minWait) * (GetRandomValue(0, 1000) / 1000.0f) + minWait;
-    CoworkerInit(cw, moveDuration, waitDuration, startPos, endPos, GRID_SIZE, 0);
+    CoworkerInit(cw, moveDuration, waitDuration, startPos, endPos, GRID_SIZE, gender);
     ++nextCoworkerIdx;
 }
