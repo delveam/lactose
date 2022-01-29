@@ -6,9 +6,7 @@
 
 typedef enum
 {
-    IDLE = 0,
-    HORIZONTAL = 1,
-    VERTICAL = 2
+    IDLE = 0, HORIZONTAL = 1, VERTICAL = 2
 } WalkDir;
 
 // For the timers, -1 indicates it is not in the state associated with the timer (e.g. not currently moving).
@@ -32,7 +30,7 @@ typedef struct
 void CoworkerInit(Coworker* coworker, float moveDuration, float waitDuration, Coord startPos,
                   Coord endPos, float size, int isMan);
 void CoworkerUpdate(Coworker* coworker);
-void CoworkerDraw(Coworker* coworker, Texture2D sprites);
+void CoworkerRegisterDraw(Coworker* coworker);
 
 
 #endif

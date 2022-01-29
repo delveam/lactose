@@ -179,7 +179,7 @@ void CoworkerUpdate(Coworker* coworker)
     }
 }
 
-void CoworkerDraw(Coworker* coworker, Texture2D sprites)
+void CoworkerRegisterDraw(Coworker* coworker)
 {
     {
         Rectangle source = { 0, 208, 32, 48 };
@@ -214,6 +214,7 @@ void CoworkerDraw(Coworker* coworker, Texture2D sprites)
         }
 
         Vector2 position = { coworker->pos.x * GRID_SIZE - 10 + 3, coworker->pos.y * GRID_SIZE - 35 + 3 };
-        DrawTextureRec(sprites, source, position, WHITE);
+        DrawJob job = { source, position, WHITE, 2 };
+        RegisterDraw(job);
     }
 }

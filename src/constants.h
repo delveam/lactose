@@ -1,6 +1,8 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
+#include "raylib.h"
+
 #define MAX(a,b) (((a)>(b))?(a):(b))
 #define MIN(a,b) (((a)<(b))?(a):(b))
 
@@ -13,5 +15,13 @@ typedef enum
     RIGHT = 2,
     DOWN = 4
 } Direction;
+
+typedef struct
+{
+    Rectangle source;
+    Vector2 pos;
+    Color tint;
+    int layer;
+} DrawJob;
 
 #endif
