@@ -2,7 +2,8 @@
 
 #include <assert.h>
 
-void CoworkerInit(Coworker* coworker, float moveDuration, float waitDuration, Coord startPos, Coord endPos, float size, int isMan)
+void CoworkerInit(Coworker* coworker, float moveDuration, float waitDuration, Coord startPos,
+                  Coord endPos, float size, int isMan)
 {
     coworker->facing = DOWN;
     coworker->pos = startPos;
@@ -24,16 +25,25 @@ void CoworkerInit(Coworker* coworker, float moveDuration, float waitDuration, Co
 
     coworker->moveTimer = 0;
     coworker->waitTimer = -1;
-    
+
     int dx = startPos.x - endPos.x;
     int dy = startPos.y - endPos.y;
 
     coworker->facing = DOWN;
     coworker->isMan = isMan;
 
-    if (dx != 0) coworker->walkDirection = HORIZONTAL;
-    else if (dy != 0) coworker->walkDirection = VERTICAL;
-    else coworker->walkDirection = IDLE;
+    if (dx != 0)
+    {
+        coworker->walkDirection = HORIZONTAL;
+    }
+    else if (dy != 0)
+    {
+        coworker->walkDirection = VERTICAL;
+    }
+    else
+    {
+        coworker->walkDirection = IDLE;
+    }
 }
 
 static void Move(Coworker* coworker, int dx, int dy)
@@ -42,15 +52,27 @@ static void Move(Coworker* coworker, int dx, int dy)
     {
         case VERTICAL:
         {
-            if (dy > 0) coworker->facing = DOWN;
-            else if (dy < 0) coworker->facing = UP;
+            if (dy > 0)
+            {
+                coworker->facing = DOWN;
+            }
+            else if (dy < 0)
+            {
+                coworker->facing = UP;
+            }
             coworker->pos.y += dy;
             break;
         }
         case HORIZONTAL:
         {
-            if (dx < 0) coworker->facing = LEFT;
-            else if (dx > 0) coworker->facing = RIGHT;
+            if (dx < 0)
+            {
+                coworker->facing = LEFT;
+            }
+            else if (dx > 0)
+            {
+                coworker->facing = RIGHT;
+            }
             coworker->pos.x += dx;
             break;
         }
@@ -65,23 +87,38 @@ static void Move(Coworker* coworker, int dx, int dy)
 
 static void WalkUpdate(Coworker* coworker)
 {
-    if (coworker->moveTimer <= coworker->moveDuration) return;
+    if (coworker->moveTimer <= coworker->moveDuration)
+    {
+        return;
+    }
 
     switch (coworker->walkDirection)
     {
         case HORIZONTAL:
         {
             int dx = 0;
-            if ((coworker->tgtPos.x - coworker->pos.x) > 0) dx = 1;
-            else dx = -1;
+            if ((coworker->tgtPos.x - coworker->pos.x) > 0)
+            {
+                dx = 1;
+            }
+            else
+            {
+                dx = -1;
+            }
             Move(coworker, dx, 0);
             break;
         }
         case VERTICAL:
         {
             int dy = 0;
-            if ((coworker->tgtPos.y - coworker->pos.y) > 0) dy = 1;
-            else dy = -1;
+            if ((coworker->tgtPos.y - coworker->pos.y) > 0)
+            {
+                dy = 1;
+            }
+            else
+            {
+                dy = -1;
+            }
             Move(coworker, 0, dy);
             break;
         }
@@ -126,7 +163,7 @@ void CoworkerUpdate(Coworker* coworker)
 {
     // timers should be mutually exclusive
     assert(coworker->moveTimer != -1 ^ coworker->waitTimer != -1);
-    
+
     int isWaiting = coworker->moveTimer == -1;
     int isWalking = coworker->waitTimer == -1;
 
@@ -171,7 +208,10 @@ void CoworkerDraw(Coworker* coworker, Texture2D sprites)
             }
         }
 
-        if (!coworker->isMan) source.x += 128;
+        if (!coworker->isMan)
+        {
+            source.x += 128;
+        }
 
         Vector2 position = { coworker->pos.x * GRID_SIZE - 10 + 3, coworker->pos.y * GRID_SIZE - 35 + 3 };
         DrawTextureRec(sprites, source, position, WHITE);

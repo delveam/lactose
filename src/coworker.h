@@ -12,7 +12,8 @@ typedef enum
 } WalkDir;
 
 // For the timers, -1 indicates it is not in the state associated with the timer (e.g. not currently moving).
-typedef struct {
+typedef struct
+{
     Coord pos;
     Coord startPos;
     Coord endPos;
@@ -28,7 +29,8 @@ typedef struct {
     int isMan;
 } Coworker;
 
-void CoworkerInit(Coworker* coworker, float moveDuration, float waitDuration, Coord startPos, Coord endPos, float size, int isMan);
+void CoworkerInit(Coworker* coworker, float moveDuration, float waitDuration, Coord startPos,
+                  Coord endPos, float size, int isMan);
 void CoworkerUpdate(Coworker* coworker);
 void CoworkerDraw(Coworker* coworker, Texture2D sprites);
 

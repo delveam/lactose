@@ -265,7 +265,9 @@ void UpdateWorld()
 
         if (fartOverloadStopwatch >= 8.0f)
         {
-            fartCooldownStopwatch += GetFrameTime(); if (fartCooldownStopwatch >= 4.0f) {
+            fartCooldownStopwatch += GetFrameTime();
+            if (fartCooldownStopwatch >= 4.0f)
+            {
                 fartOverloadStopwatch = 0.0f;
                 fartCooldownStopwatch = 0.0f;
                 fartFrequencyStopwatch = 0.0f;
