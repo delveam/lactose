@@ -48,6 +48,9 @@ int main(void)
 
     InitWorld();
 
+    SetGesturesEnabled(GESTURE_SWIPE_UP | GESTURE_SWIPE_DOWN | GESTURE_SWIPE_LEFT |
+                       GESTURE_SWIPE_RIGHT);
+
     // Load global data (assets that must be available in all screens, i.e. font)
 
 #if defined(PLATFORM_WEB)

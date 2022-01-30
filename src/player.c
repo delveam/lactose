@@ -105,19 +105,19 @@ void PlayerMove(Player* player, Direction direction)
 
 static void Input(Player* player)
 {
-    if (IsKeyPressed(KEY_UP))
+    if (IsKeyPressed(KEY_UP) || IsGestureDetected(GESTURE_SWIPE_UP))
     {
         PlayerMove(player, UP);
     }
-    else if (IsKeyPressed(KEY_DOWN))
+    else if (IsKeyPressed(KEY_DOWN) || IsGestureDetected(GESTURE_SWIPE_DOWN))
     {
         PlayerMove(player, DOWN);
     }
-    else if (IsKeyPressed(KEY_LEFT))
+    else if (IsKeyPressed(KEY_LEFT) || IsGestureDetected(GESTURE_SWIPE_LEFT))
     {
         PlayerMove(player, LEFT);
     }
-    else if (IsKeyPressed(KEY_RIGHT))
+    else if (IsKeyPressed(KEY_RIGHT) || IsGestureDetected(GESTURE_SWIPE_RIGHT))
     {
         PlayerMove(player, RIGHT);
     }
