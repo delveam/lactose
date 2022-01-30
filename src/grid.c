@@ -74,7 +74,7 @@ void InitWorld()
     // fartSounds[0] = LoadSound("resources/fart_0.mp3");
     // fartSounds[1] = LoadSound("resources/fart_1.mp3");
     // fartSounds[2] = LoadSound("resources/fart_2.mp3");
-    // bgm = LoadMusicStream("resources/bgm.wav");
+    // bgm = LoadMusicStream("resources/bgm.mp3");
 
     SetSoundVolume(fartSounds[0], 0.2f);
     SetSoundVolume(fartSounds[1], 0.2f);
