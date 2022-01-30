@@ -681,3 +681,8 @@ static void AddCoworker(Coord startPos, Coord endPos, int gender)
     CoworkerInit(cw, moveDuration, waitDuration, startPos, endPos, GRID_SIZE, gender);
     ++nextCoworkerIdx;
 }
+
+int InFartZone(int x, int y)
+{
+    return zone[y * GRID_WIDTH + x];
+}

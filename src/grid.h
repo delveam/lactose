@@ -36,6 +36,7 @@ Cell GetCell(int x, int y);
 Cell GetTask(int x, int y);
 Fart GetFart(Fart* self, int x, int y);
 void SetFart(Fart* help, int x, int y, Fart value);
+int InFartZone(int x, int y);
 Coord ScreenToGrid(float x, float y);
 Vector2 GridToScreen(int x, int y);
 void FartHere(int x, int y);

@@ -25,6 +25,11 @@ typedef struct
     Direction facing;
     WalkDir walkDirection;
     int isMan;
+    int fartStunned;
+    float stunTimer;
+    int turnIndex;
+    int exclaimIndex;
+    int health;
 } Coworker;
 
 void CoworkerInit(Coworker* coworker, float moveDuration, float waitDuration, Coord startPos,
