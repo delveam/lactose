@@ -345,7 +345,7 @@ void UpdateWorld()
 
             fartFrequencyStopwatch += GetFrameTime();
 
-            if (fartFrequencyStopwatch >= 1.5f || (turnNeedsToBeResolved && turns % 4 == 0))
+            if (fartFrequencyStopwatch >= 1.5f || (turnNeedsToBeResolved && turns % 3 == 0))
             {
                 int dx = 0;
                 int dy = 0;
